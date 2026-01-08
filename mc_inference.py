@@ -4,10 +4,10 @@ import onnxruntime as ort
 import time
 import mediapipe as mp
 import json
-import win32com.client # Direct Windows SAPI access (more stable than pyttsx3)
+import win32com.client 
 import threading
 import queue
-import pythoncom # Required for stable TTS in threads on Windows
+import pythoncom 
 import textwrap
 
 # ==========================================
@@ -32,7 +32,7 @@ HISTORY_SIZE = (300, 600)
 # Timing Thresholds
 CHAR_PAUSE_THRESHOLD = 2.0  
 WORD_PAUSE_THRESHOLD = 5.0  
-MIN_OPEN_STABILITY = 0.1 # seconds; debounce time to ignore blink glitches
+MIN_OPEN_STABILITY = 0.1 
 
 # ==========================================
 #           TEXT TO SPEECH SETUP
@@ -41,11 +41,8 @@ speech_queue = queue.Queue()
 
 def speech_worker():
     """Persistent background thread that handles all speech requests"""
-    # CRITICAL: Initialize COM for this thread on Windows
     pythoncom.CoInitialize()
-    
     try:
-        # Initialize the native Windows voice engine directly
         speaker = win32com.client.Dispatch("SAPI.SpVoice")
     except Exception as e:
         print(f"SAPI Initialization Error: {e}")
@@ -54,22 +51,17 @@ def speech_worker():
     while True:
         text = speech_queue.get()
         if text is None: break 
-        
         try:
-            # Direct Speak call is much faster and more stable in threads
             speaker.Speak(text)
         except Exception as e:
             print(f"Speech error: {e}")
-        
         speech_queue.task_done()
-    
     pythoncom.CoUninitialize()
 
 speech_thread = threading.Thread(target=speech_worker, daemon=True)
 speech_thread.start()
 
 def speak_text(text):
-    """Adds text to the speech queue"""
     if text and text != "?":
         speech_queue.put(text)
 
@@ -78,7 +70,6 @@ def speak_text(text):
 # ==========================================
 print("Loading models...")
 
-# Load BOTH maps for switching
 try:
     with open("lstm_word_map.json", "r") as f:
         word_map = json.load(f)
@@ -95,7 +86,6 @@ except Exception as e:
     print(f"Error loading label map: {e}")
     idx_to_char = {}
 
-# State for Mode Switching
 current_mode = "WORD"
 idx_to_label = idx_to_word
 
@@ -111,11 +101,9 @@ def toggle_mode():
 
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
-        # Button area: (800, 10) to (980, 50)
         if 800 <= x <= 980 and 10 <= y <= 50:
             toggle_mode()
 
-# Load models with flexible provider selection
 def create_session(path):
     try:
         return ort.InferenceSession(path, providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
@@ -130,7 +118,10 @@ cnn_input_name = ort_session.get_inputs()[0].name
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True)
+
+# Define Both Eyes
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
+RIGHT_EYE = [362, 385, 387, 263, 373, 380]
 
 # ==========================================
 #           HELPER FUNCTIONS
@@ -144,7 +135,6 @@ def preprocess_cnn(crop):
 
 def predict_letter(raw_durations):
     if not raw_durations: return ""
-    # Shape to (1, T, 1) as expected by LSTM
     arr = np.array([[min(d, 2.0) for d in raw_durations]], dtype=np.float32)[:, :, None]
     feed = {"input": arr}
     if "lengths" in lstm_inputs:
@@ -154,16 +144,55 @@ def predict_letter(raw_durations):
     pred_idx = int(np.argmax(logits, axis=1)[0])
     return idx_to_label.get(pred_idx, "?")
 
-def get_eye_crop(frame, landmarks, w, h):
-    pts = [(int(landmarks[i].x * w), int(landmarks[i].y * h)) for i in LEFT_EYE]
-    x_vals, y_vals = [p[0] for p in pts], [p[1] for p in pts]
-    cx, cy = (min(x_vals) + max(x_vals)) // 2, (min(y_vals) + max(y_vals)) // 2
-    max_dim = max(max(x_vals) - min(x_vals), max(y_vals) - min(y_vals))
-    side = int(max_dim * 2.0) # Slightly larger crop for better features
-    half = side // 2
-    x1, y1 = max(cx - half, 0), max(cy - half, 0)
-    x2, y2 = min(cx + half, w), min(cy + half, h)
-    return frame[y1:y2, x1:x2]
+def get_aligned_eye_crop(frame, landmarks, eye_indices, w, h):
+    """
+    Rotates the frame to align the eye horizontally before cropping.
+    Increases detection accuracy when head is tilted.
+    """
+    # Get all points for the eye
+    pts = [(int(landmarks[i].x * w), int(landmarks[i].y * h)) for i in eye_indices]
+    
+    # Calculate Center of the eye
+    x_vals = [p[0] for p in pts]
+    y_vals = [p[1] for p in pts]
+    cx = int(np.mean(x_vals))
+    cy = int(np.mean(y_vals))
+    
+    # Sort points by x-coord to find corners
+    sorted_x = sorted(pts, key=lambda k: k[0])
+    left_corner = sorted_x[0]
+    right_corner = sorted_x[-1]
+    
+    # Calculate Angle for Rotation (Head Tilt)
+    dY = right_corner[1] - left_corner[1]
+    dX = right_corner[0] - left_corner[0]
+    angle = np.degrees(np.arctan2(dY, dX))
+    
+    # Get Rotation Matrix (rotate around the eye center)
+    M = cv2.getRotationMatrix2D((cx, cy), angle, 1.0)
+    
+    # Determine dynamic crop size based on eye width
+    eye_width = np.sqrt(dX**2 + dY**2)
+    crop_size = int(eye_width * 2.0) # 2x multiplier ensures we get the whole eye + skin
+    if crop_size < 32: crop_size = 32 # Minimum safety size
+    
+    # Perform Affine Warp (Rotate the whole image around the eye center)
+    rotated_frame = cv2.warpAffine(frame, M, (w, h))
+    
+    # Crop from the ROTATED frame
+    half = crop_size // 2
+    x1 = max(cx - half, 0)
+    y1 = max(cy - half, 0)
+    x2 = min(cx + half, w)
+    y2 = min(cy + half, h)
+    
+    crop = rotated_frame[y1:y2, x1:x2]
+    
+    # Check if crop is valid (sometimes rotation pushes it off edge)
+    if crop.shape[0] == 0 or crop.shape[1] == 0:
+        return np.array([])
+        
+    return crop
 
 # ==========================================
 #           MAIN LOOP
@@ -176,9 +205,9 @@ def main():
     potential_open_start = None
     last_open_time = time.time()
     current_blink_sequence = []
-    decoded_history = [] # List of strings instead of single string
+    decoded_history = [] 
     
-    print("System Ready! SAPI TTS & Timers Enabled.")
+    print("System Ready! Alignment & Switching Enabled.")
     
     cv2.namedWindow("LSTM Morse Decoder with TTS")
     cv2.setMouseCallback("LSTM Morse Decoder with TTS", mouse_callback)
@@ -197,15 +226,33 @@ def main():
         results = face_mesh.process(rgb)
         
         eye_state = "OPEN"
-        cnn_val = 1 # Debug raw value
+        active_eye_name = "LEFT"
+        cnn_val = 1 
         now = time.time()
 
         if results.multi_face_landmarks:
-            landmarks = results.multi_face_landmarks[0].landmark
-            crop = get_eye_crop(frame, landmarks, w, h)
+            face = results.multi_face_landmarks[0]
+            landmarks = face.landmark
+            
+            # --- DYNAMIC EYE SWITCHING LOGIC ---
+            # Compare Z-depth of inner eye corners
+            # 33 is Left Inner, 362 is Right Inner
+            left_dist = landmarks[33].z 
+            right_dist = landmarks[362].z
+            
+            # Pick the eye closer to the camera (smaller Z)
+            if left_dist < right_dist:
+                active_eye_indices = LEFT_EYE
+                active_eye_name = "LEFT"
+            else:
+                active_eye_indices = RIGHT_EYE
+                active_eye_name = "RIGHT"
+
+            # Use new Alignment Function
+            crop = get_aligned_eye_crop(frame, landmarks, active_eye_indices, w, h)
             
             if crop.size != 0:
-                # 1. Run CNN
+                # Run CNN
                 cnn_out = ort_session.run(None, {cnn_input_name: preprocess_cnn(crop)})
                 cnn_val = np.argmax(cnn_out[0]) # 0=Closed, 1=Open
                 
@@ -222,7 +269,6 @@ def main():
                             potential_open_start = now
                         
                         if (now - potential_open_start) > MIN_OPEN_STABILITY:
-                            # Blink finished
                             duration = potential_open_start - closed_start_time
                             is_closed = False
                             potential_open_start = None
@@ -231,10 +277,9 @@ def main():
                                 print(f"Blink recorded: {duration:.2f}s")
                             last_open_time = now
 
-        # 3. Prediction Timer Logic
+        # Prediction Timer Logic
         time_since_last_blink = now - last_open_time
         
-        # Trigger Prediction
         if len(current_blink_sequence) > 0 and time_since_last_blink > CHAR_PAUSE_THRESHOLD:
             predicted_char = predict_letter(current_blink_sequence)
             if predicted_char:
@@ -243,15 +288,10 @@ def main():
                 print(f"Result: {predicted_char}")
             
             current_blink_sequence = []
-            last_open_time = now # Reset timer to avoid immediate space
-
-        # Space detection (Optional: add visual separator or ignore)
-        # if time_since_last_blink > WORD_PAUSE_THRESHOLD:
-        #    pass 
+            last_open_time = now
 
         # --- UI DRAWING ---
-        # Create Canvas
-        canvas = np.ones((WINDOW_HEIGHT, WINDOW_WIDTH, 3), dtype=np.uint8) * 240 # Light gray background
+        canvas = np.ones((WINDOW_HEIGHT, WINDOW_WIDTH, 3), dtype=np.uint8) * 240 
 
         # Header
         cv2.rectangle(canvas, (0, 0), (WINDOW_WIDTH, 60), (200, 200, 200), -1)
@@ -266,39 +306,32 @@ def main():
         # 1. Live Video Feed
         vx, vy = VIDEO_POS
         
-        # Calculate aspect-ratio preserving resize
         h_frame, w_frame = frame.shape[:2]
         scale = min(VIDEO_WIDTH / w_frame, VIDEO_HEIGHT / h_frame)
         new_w = int(w_frame * scale)
         new_h = int(h_frame * scale)
-        
         frame_resized = cv2.resize(frame, (new_w, new_h))
         
         # Draw overlays on the video feed
         color = (0, 0, 255) if eye_state == "CLOSED" else (0, 255, 0)
         cv2.putText(frame_resized, f"Eye: {eye_state}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
-        
-        # Center the video in the box
+        cv2.putText(frame_resized, f"Active: {active_eye_name}", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 200, 0), 2)
+
         y_offset = vy + (VIDEO_HEIGHT - new_h) // 2
         x_offset = vx + (VIDEO_WIDTH - new_w) // 2
         
-        # Draw black background for video box
         cv2.rectangle(canvas, (vx, vy), (vx+VIDEO_WIDTH, vy+VIDEO_HEIGHT), (0, 0, 0), -1)
-        
-        # Place video on canvas
         canvas[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = frame_resized
         cv2.rectangle(canvas, (vx, vy), (vx+VIDEO_WIDTH, vy+VIDEO_HEIGHT), (0, 0, 0), 2)
         cv2.putText(canvas, "Live Video Feed", (vx + 10, vy - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
 
-        # 2. Translation Field (Current Sequence)
+        # 2. Translation Field
         tx, ty = TRANS_FIELD_POS
         tw, th = TRANS_FIELD_SIZE
         cv2.rectangle(canvas, (tx, ty), (tx+tw, ty+th), (255, 255, 255), -1)
         cv2.rectangle(canvas, (tx, ty), (tx+tw, ty+th), (0, 0, 0), 1)
-        # Label inside the box, smaller
         cv2.putText(canvas, "Translation Field", (tx + 5, ty + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 100, 100), 1)
         
-        # Visualize current blink sequence as dots/dashes
         seq_str = ""
         for dur in current_blink_sequence:
             if dur < 0.5: seq_str += "."
@@ -314,12 +347,11 @@ def main():
         cv2.putText(canvas, "Translation History", (hx + 10, hy + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
         cv2.line(canvas, (hx, hy+40), (hx+hw, hy+40), (0,0,0), 1)
 
-        # Draw the decoded history (last 15 entries)
-        y_offset = hy + 70
+        y_off = hy + 70
         visible_history = decoded_history[-15:]
         for item in visible_history:
-            cv2.putText(canvas, item, (hx+10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
-            y_offset += 35
+            cv2.putText(canvas, item, (hx+10, y_off), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+            y_off += 35
 
         cv2.imshow("LSTM Morse Decoder with TTS", canvas)
         
@@ -328,11 +360,10 @@ def main():
         if key == ord('c'):
             cap.release()
             current_cam_idx += 1
-            if current_cam_idx > 3: current_cam_idx = 0 # Cycle 0-3
+            if current_cam_idx > 3: current_cam_idx = 0 
             cap = cv2.VideoCapture(current_cam_idx)
             print(f"Switching to camera {current_cam_idx}...")
 
-    # Exit
     speech_queue.put(None)
     cap.release()
     cv2.destroyAllWindows()
