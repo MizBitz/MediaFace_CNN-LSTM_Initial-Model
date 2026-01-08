@@ -12,28 +12,30 @@ import random
 DATASET_DIR = "dataset_dynamic_aligned"
 
 # INPUT: Path to your MEAD dataset folder
-# UPDATE THIS to the path shown in your screenshot
 MEAD_ROOT_DIR = r"D:\Video Dataset" 
 
 # --- DYNAMIC CURVE CONFIGURATION ---
-# 1. Base Values (At mid-range distance, mild pose)
-BASE_CLOSED_THRESH = 0.077   # UPDATED: Stricter to prevent false positives
+BASE_CLOSED_THRESH = 0.08   
 BASE_OPEN_THRESH   = 0.21
 
 # Sensitivity for saving both eyes. 
-# If head turn is less than this, we save both. If more, we drop the blocked eye.
 MAX_Z_DIFF_FOR_BOTH = 0.05
 
-# 2. Maximum Limits (Hard Caps)
-MAX_CLOSED_THRESH = 0.115   # UPDATED: Stricter hard cap
+# 2. Maximum Limits
+MAX_CLOSED_THRESH = 0.120   
 MIN_OPEN_THRESH   = 0.180
+
+# --- NEW: CENTER GAP VETO ---
+# If the center of the eye is open by more than this ratio (5% of width),
+# we reject the "closed" label. Fixes "squinting but open" errors.
+CENTER_CLOSURE_THRESH = 0.05 
 
 # 3. ANGLE CURVE CONFIG (Head Pitch)
 ANGLE_MAX_MAG = 1.2          
 ANGLE_CLOSED_BOOST_MAX = 0.015  
 ANGLE_OPEN_DROP_MAX   = 0.020  
 
-# 4. SCALE CURVE CONFIG (Face Distance) - CRITICAL FOR DISTANCE MATH
+# 4. SCALE CURVE CONFIG
 SCALE_REF_NEAR  = 0.04
 SCALE_REF_MID   = 0.11
 SCALE_REF_FAR   = 0.22
@@ -44,12 +46,11 @@ SCALE_CLOSED_FAR  = 0.125
 # Open threshold band
 OPEN_BAND_OFFSET = 0.09   
 
-# 5. SCALE REFERENCE (for display only)
+# 5. SCALE REFERENCE
 OPTIMAL_FACE_RATIO = SCALE_REF_MID
 
 # --- Dataset Balancing ---
-# Lower this if you get too many open eye samples vs closed
-OPEN_EYE_SAVE_PROB = 0.001 
+OPEN_EYE_SAVE_PROB = 0.15 
 
 # --- Image Quality ---
 PATCH_SIZE = (64, 64)     
@@ -71,8 +72,14 @@ face_mesh = mp_face_mesh.FaceMesh(
     min_tracking_confidence=0.5
 )
 
+# Standard EAR Landmarks
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
 RIGHT_EYE = [362, 385, 387, 263, 373, 380]
+
+# NEW: Center Eyelid Landmarks (Top, Bottom)
+LEFT_CENTER_PAIR = [159, 145]
+RIGHT_CENTER_PAIR = [386, 374]
+
 NOSE_TIP = 1
 CHIN = 152
 FOREHEAD = 10
@@ -97,23 +104,37 @@ def compute_3D_EAR(landmarks, eye_indices, w, h):
     pts_2d = [(int(p[0]), int(p[1])) for p in [p1, p2, p3, p4, p5, p6]]
     return EAR, pts_2d
 
+def get_center_gap_ratio(landmarks, center_pair, corner_indices, w, h):
+    """
+    Calculates the gap between the precise center of the eyelids
+    divided by the eye width.
+    """
+    p_top = get_3d_point(landmarks[center_pair[0]], w, h)
+    p_bot = get_3d_point(landmarks[center_pair[1]], w, h)
+    
+    p_left = get_3d_point(landmarks[corner_indices[0]], w, h)
+    p_right = get_3d_point(landmarks[corner_indices[1]], w, h)
+    
+    center_dist = np.linalg.norm(p_top - p_bot)
+    width_dist = np.linalg.norm(p_left - p_right)
+    
+    if width_dist == 0: return 1.0
+    return center_dist / width_dist
+
 def get_head_pose_ratios(landmarks):
     nose = landmarks[NOSE_TIP]
     left_outer = landmarks[33]
     right_outer = landmarks[263]
     
-    # Yaw
     eye_mid_x = (left_outer.x + right_outer.x) / 2
     face_width = abs(right_outer.x - left_outer.x)
     yaw_ratio = (nose.x - eye_mid_x) / (face_width + 1e-6)
     
-    # Pitch
     forehead = landmarks[FOREHEAD]
     chin = landmarks[CHIN]
     face_height = abs(chin.y - forehead.y)
     face_mid_y = (forehead.y + chin.y) / 2
     pitch_ratio = (nose.y - face_mid_y) / (face_height + 1e-6)
-    
     return yaw_ratio, pitch_ratio
 
 def get_face_scale_ratio(landmarks):
@@ -143,7 +164,6 @@ def open_thresh_from_closed(closed_thresh):
     raw_open = closed_thresh + OPEN_BAND_OFFSET
     return np.clip(raw_open, MIN_OPEN_THRESH, BASE_OPEN_THRESH)
 
-# --- ALIGNMENT LOGIC (Crucial for Tilted Heads) ---
 def get_aligned_eye_crop(frame, landmarks, eye_indices, w, h):
     pts = [(int(landmarks[i].x * w), int(landmarks[i].y * h)) for i in eye_indices]
     
@@ -152,26 +172,20 @@ def get_aligned_eye_crop(frame, landmarks, eye_indices, w, h):
     cx = int(np.mean(x_vals))
     cy = int(np.mean(y_vals))
     
-    # Calculate Angle for Rotation
     sorted_x = sorted(pts, key=lambda k: k[0])
-    left_corner = sorted_x[0]
-    right_corner = sorted_x[-1]
     
-    dY = right_corner[1] - left_corner[1]
-    dX = right_corner[0] - left_corner[0]
+    dY = sorted_x[-1][1] - sorted_x[0][1]
+    dX = sorted_x[-1][0] - sorted_x[0][0]
     angle = np.degrees(np.arctan2(dY, dX))
     
-    # Rotate the entire frame around the eye center
     M = cv2.getRotationMatrix2D((cx, cy), angle, 1.0)
     
-    # Dynamic crop size
     eye_width = np.sqrt(dX**2 + dY**2)
     crop_size = int(eye_width * 2.0) 
     if crop_size < 32: crop_size = 32
     
     rotated_frame = cv2.warpAffine(frame, M, (w, h))
     
-    # Crop from Rotated Frame
     half = crop_size // 2
     x1 = max(cx - half, 0)
     y1 = max(cy - half, 0)
@@ -193,7 +207,6 @@ def process_for_save(crop, size):
 #           MAIN EXECUTION (MEAD)
 # ==========================================
 
-# 1. Load the Progress Log (Resume Capability)
 processed_videos = set()
 if os.path.exists(LOG_FILE):
     with open(LOG_FILE, "r") as f:
@@ -201,7 +214,6 @@ if os.path.exists(LOG_FILE):
 
 print(f"Resuming... {len(processed_videos)} videos already completed.")
 
-# 2. Gather all video files
 print(f"Scanning MEAD Directory: {MEAD_ROOT_DIR}")
 video_files = []
 for root, dirs, files in os.walk(MEAD_ROOT_DIR):
@@ -217,21 +229,18 @@ if not video_files:
 print(f"Found {len(video_files)} videos. Starting processing...")
 
 for video_idx, video_path in enumerate(video_files):
-    # --- RESUME CHECK ---
     if video_path in processed_videos:
-        continue # Skip already done videos
+        continue 
         
     print(f"[{video_idx+1}/{len(video_files)}] Processing: {os.path.basename(video_path)}")
     
     cap = cv2.VideoCapture(video_path)
     video_frame_count = 0
-    
-    # Safe name for file saving
     safe_video_name = os.path.splitext(os.path.basename(video_path))[0]
     
     while cap.isOpened():
         ret, frame = cap.read()
-        if not ret: break # End of video
+        if not ret: break 
         
         h, w, _ = frame.shape
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -239,31 +248,29 @@ for video_idx, video_path in enumerate(video_files):
 
         label = None
         
-        # Default Calculation Variables
-        cur_closed_thresh = BASE_CLOSED_THRESH
-        cur_open_thresh = BASE_OPEN_THRESH
-        current_ear = 0
-        face_ratio = OPTIMAL_FACE_RATIO  
-        
         if results.multi_face_landmarks:
             face = results.multi_face_landmarks[0].landmark
             
-            # --- 1. DETERMINE ACTIVE EYE & DEPTH ---
+            # 1. Determine Active Eye
             left_dist = face[33].z 
             right_dist = face[362].z
             using_left = (left_dist < right_dist)
             
             if using_left:
                 active_eye_indices = LEFT_EYE
+                center_pair = LEFT_CENTER_PAIR
+                corner_indices = [33, 133] # Corners of Left Eye
             else:
                 active_eye_indices = RIGHT_EYE
+                center_pair = RIGHT_CENTER_PAIR
+                corner_indices = [362, 263] # Corners of Right Eye
 
-            # --- 2. GET POSE & SCALE ---
+            # 2. Get Pose & Scale
             yaw, pitch = get_head_pose_ratios(face)
             angle_mag = abs(yaw) + abs(pitch)
             face_ratio = get_face_scale_ratio(face)
 
-            # --- 3. DYNAMIC THRESHOLDS ---
+            # 3. Dynamic Thresholds
             scale_closed = closed_thresh_from_scale(face_ratio)
             ang_f = angle_factor(angle_mag)
             
@@ -273,43 +280,43 @@ for video_idx, video_path in enumerate(video_files):
             base_open = open_thresh_from_closed(cur_closed_thresh)
             cur_open_thresh = max(base_open - (ANGLE_OPEN_DROP_MAX * ang_f), MIN_OPEN_THRESH)
 
-            # --- 4. COMPUTE EAR (Active Eye Only) ---
+            # 4. Compute EAR & Center Gap
             current_ear, _ = compute_3D_EAR(face, active_eye_indices, w, h)
+            
+            # NEW: Measure precise center gap
+            center_ratio = get_center_gap_ratio(face, center_pair, corner_indices, w, h)
 
-            # --- 5. LABEL LOGIC ---
+            # 5. Label Logic with VETO
             if current_ear > cur_open_thresh:
                 if random.random() < OPEN_EYE_SAVE_PROB:
                     label = "open"
+            
             elif current_ear < cur_closed_thresh:
-                label = "closed"
+                # --- VETO CHECK ---
+                # Only label 'closed' if the center of the eyelid is ACTUALLY closed.
+                if center_ratio < CENTER_CLOSURE_THRESH:
+                    label = "closed"
+                else:
+                    # EAR says closed, but center is open -> It's a squint. Discard.
+                    label = None
 
-            # --- 6. SAVING LOGIC (Safe Zone + Alignment) ---
+            # 6. Saving Logic
             if label is not None:
                 eyes_to_save = []
-                
-                # Check Head Turn Severity
                 z_diff = abs(left_dist - right_dist)
                 
-                # Save Left? (Yes if closer OR if head turn is small)
                 if (left_dist < right_dist) or (z_diff < MAX_Z_DIFF_FOR_BOTH):
                     eyes_to_save.append((LEFT_EYE, "L"))
                 
-                # Save Right? (Yes if closer OR if head turn is small)
                 if (right_dist < left_dist) or (z_diff < MAX_Z_DIFF_FOR_BOTH):
                     eyes_to_save.append((RIGHT_EYE, "R"))
 
                 for indices, suffix in eyes_to_save:
-                    # ALIGNMENT HAPPENS HERE
                     crop_bgr = get_aligned_eye_crop(frame, face, indices, w, h)
-                    
-                    # GRAYSCALE & RESIZE
                     final_patch = process_for_save(crop_bgr, PATCH_SIZE)
 
                     if final_patch is not None:
-                        # Construct unique filename
-                        # filename = f"{label}_{safe_video_name}_{video_frame_count}_{suffix}.jpg"
                         filename = f"{label}_MEAD_{safe_video_name}_{video_frame_count}_{PATCH_SIZE[0]}x{PATCH_SIZE[1]}_dyn_{suffix}.jpg"
-                        
                         save_path = os.path.join(DATASET_DIR, label, filename)
                         cv2.imwrite(save_path, final_patch)
 
@@ -317,7 +324,6 @@ for video_idx, video_path in enumerate(video_files):
 
     cap.release()
     
-    # --- MARK VIDEO AS DONE ---
     with open(LOG_FILE, "a") as f:
         f.write(video_path + "\n")
 
