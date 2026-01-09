@@ -7,7 +7,7 @@ import os
 import numpy as np
 
 # ================= CONFIGURATION =================
-DATASET_DIR = "dataset_dynamic_aligned"
+DATASET_DIR = r"S:\Video Recording\dataset_dynamic_aligned"
 MODEL_SAVE_PATH = "eye_state_mobilenet.onnx"
 BATCH_SIZE = 32
 LEARNING_RATE = 0.001

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 # filepath: s:\VSCode Projects\MediaFace\EDA\eda_lstm_jsonl.py
-DATA_PATH = "morse_sequences.jsonl"
+DATA_PATH = r"S:\VSCode Projects\MediaFace\morse_sequences.jsonl"
 
 def load_rows(path):
     rows = []

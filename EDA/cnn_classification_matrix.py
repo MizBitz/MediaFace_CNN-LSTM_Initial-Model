@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+import onnxruntime as ort
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from sklearn.metrics import classification_report, confusion_matrix
@@ -10,60 +10,23 @@ import numpy as np
 # ==========================================
 #           CONFIGURATION
 # ==========================================
-MODEL_PATH = "eye_state_mobilenet.onnx"
-DATA_DIR = r"S:\VSCode Projects\Backup Code\cleaned_cnn_dataset"  # Ensure this points to your dataset folder
+# Point this to your ONNX file
+MODEL_PATH = "eye_state_mobilenet.onnx" 
+
+# Point this to your clean/validation dataset
+DATA_DIR = r"S:\VSCode Projects\Backup Code\cleaned_cnn_dataset" 
+
 BATCH_SIZE = 32
 IMAGE_SIZE = (64, 64)
 
-# ==========================================
-#      1. DEFINE MODEL CLASS (STANDALONE)
-# ==========================================
-# We define this here to avoid importing 'train_cnn.py', 
-# which would accidentally trigger a re-training loop.
-class EyeStateCNN(nn.Module):
-    def __init__(self):
-        super(EyeStateCNN, self).__init__()
-        
-        # Convolutional Block 1
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
-        self.relu1 = nn.ReLU()
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2) 
+def to_numpy(tensor):
+    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
-        # Convolutional Block 2
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.relu2 = nn.ReLU()
-        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2) 
-
-        # Convolutional Block 3
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.relu3 = nn.ReLU()
-        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2) 
-
-        # Fully Connected Block
-        self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(128 * 8 * 8, 512) 
-        self.relu4 = nn.ReLU()
-        self.dropout = nn.Dropout(0.5) 
-        self.fc2 = nn.Linear(512, 2) 
-
-    def forward(self, x):
-        x = self.pool1(self.relu1(self.conv1(x)))
-        x = self.pool2(self.relu2(self.conv2(x)))
-        x = self.pool3(self.relu3(self.conv3(x)))
-        x = self.flatten(x)
-        x = self.relu4(self.fc1(x))
-        x = self.dropout(x)
-        x = self.fc2(x)
-        return x
-
-# ==========================================
-#           MAIN EXECUTION
-# ==========================================
 def main():
-    print("Initializing SOP 1 Evaluation...")
+    print("Initializing SOP 1 Evaluation (ONNX Mode)...")
 
-    # 1. Setup Data
-    # We use the same transforms as training
+    # 1. Setup Data Pipeline
+    # We keep the PyTorch DataLoader because it's efficient at resizing/normalizing images.
     transform = transforms.Compose([
         transforms.Grayscale(num_output_channels=1),
         transforms.Resize(IMAGE_SIZE),
@@ -73,41 +36,58 @@ def main():
     
     try:
         dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
+        print(f"Loaded dataset from: {DATA_DIR}")
+        print(f"Classes: {dataset.classes}") # Should be ['closed', 'open']
     except Exception as e:
         print(f"Error loading data: {e}")
-        print(f"Make sure '{DATA_DIR}' exists.")
         return
 
     loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
     
-    # 2. Load Model
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = EyeStateCNN().to(device)
-    
+    # 2. Load ONNX Model
     try:
-        model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+        # Use CUDA if available, otherwise CPU
+        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+        session = ort.InferenceSession(MODEL_PATH, providers=providers)
         print(f"Successfully loaded {MODEL_PATH}")
-    except FileNotFoundError:
-        print(f"Error: Could not find {MODEL_PATH}. Make sure it's in the same folder.")
+    except Exception as e:
+        print(f"Error loading ONNX model: {e}")
         return
 
-    model.eval()
+    # Get input/output names
+    input_name = session.get_inputs()[0].name
     
-    # 3. Predict
+    # 3. Run Inference
     all_preds = []
     all_labels = []
     
-    print("Running evaluation on dataset...")
-    with torch.no_grad():
-        for inputs, labels in loader:
-            inputs = inputs.to(device)
-            outputs = model(inputs)
-            _, preds = torch.max(outputs, 1)
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.numpy())
+    print("Running evaluation... (This may take a moment)")
+    
+    for inputs, labels in loader:
+        # ONNX requires numpy arrays, not Tensors
+        ort_inputs = {input_name: to_numpy(inputs)}
+        
+        # Run model
+        ort_outs = session.run(None, ort_inputs)
+        
+        # Extract Logits (The raw score)
+        logits = ort_outs[0]
+        
+        # Convert Logits to Class Predictions
+        # Your MobileNet output is shape (Batch, 1). 
+        # Logic: Logit > 0 is Open (1), Logit < 0 is Closed (0).
+        if logits.shape[1] == 1:
+            preds = (logits > 0).astype(int).flatten()
+        else:
+            # Fallback for models with 2 outputs (Softmax)
+            preds = np.argmax(logits, axis=1)
+
+        all_preds.extend(preds)
+        all_labels.extend(labels.numpy())
 
     # 4. Generate Report
-    target_names = dataset.classes # Should be ['closed', 'open']
+    target_names = dataset.classes 
+    
     print("\n" + "="*40)
     print("   SOP 1 ANSWER: CLASSIFICATION METRICS")
     print("="*40)
@@ -116,15 +96,19 @@ def main():
     # 5. Plot Confusion Matrix
     cm = confusion_matrix(all_labels, all_preds)
     plt.figure(figsize=(6, 5))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=target_names, yticklabels=target_names)
-    plt.title("CNN Confusion Matrix (SOP 1 Evidence)")
+    
+    # Heatmap styling
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                xticklabels=target_names, yticklabels=target_names)
+    
+    plt.title("CNN Confusion Matrix\n(SOP 1 Evidence - ONNX)")
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
+    plt.tight_layout()
     
-    save_path = "SOP1_Evidence_Matrix.png"
+    save_path = "SOP1_Evidence_Matrix_ONNX.png"
     plt.savefig(save_path)
     print(f"\n✅ Success! Matrix saved to {save_path}")
-    print("You can now insert this image and the numbers above into Chapter 4.")
 
 if __name__ == "__main__":
     main()

@@ -10,7 +10,7 @@ import os
 # ==========================================
 #           CONFIGURATION
 # ==========================================
-DATA_DIR = r"S:\VSCode Projects\MediaFace\dataset_dynamic_aligned"
+DATA_DIR = r"S:\Video Recording\dataset_dynamic_aligned"
 BATCH_SIZE = 32
 EPOCHS = 20  # Enough to show convergence
 LR = 0.001

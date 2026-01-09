@@ -1,0 +1,37 @@
+{"ts": 1767994479.269683, "type": "blink_recorded", "blink_duration_sec": 0.23851680755615234}
+{"ts": 1767994480.2838767, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.23851680755615234], "transcript": "Registration Information", "prompt": null}
+{"ts": 1767994483.2996407, "type": "blink_recorded", "blink_duration_sec": 0.11727452278137207}
+{"ts": 1767994483.7646763, "type": "blink_recorded", "blink_duration_sec": 0.0851738452911377}
+{"ts": 1767994484.7926779, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.11727452278137207, 0.0851738452911377], "transcript": "Registration Information Units Needed", "prompt": null}
+{"ts": 1767994487.939554, "type": "blink_recorded", "blink_duration_sec": 0.3282322883605957}
+{"ts": 1767994489.4704273, "type": "blink_recorded", "blink_duration_sec": 0.09371471405029297}
+{"ts": 1767994490.0686955, "type": "blink_recorded", "blink_duration_sec": 0.1312544345855713}
+{"ts": 1767994491.389143, "type": "blink_recorded", "blink_duration_sec": 0.9005305767059326}
+{"ts": 1767994491.99045, "type": "blink_recorded", "blink_duration_sec": 0.13032746315002441}
+{"ts": 1767994492.5396616, "type": "blink_recorded", "blink_duration_sec": 0.17186903953552246}
+{"ts": 1767994493.5579467, "type": "token_committed", "mode": "WORD", "token": "Relay", "blink_sequence_sec": [0.09371471405029297, 0.1312544345855713, 0.9005305767059326, 0.13032746315002441, 0.17186903953552246], "transcript": "Relay", "prompt": null}
+{"ts": 1767994497.2624683, "type": "blink_recorded", "blink_duration_sec": 0.08815479278564453}
+{"ts": 1767994498.0953417, "type": "blink_recorded", "blink_duration_sec": 0.6364707946777344}
+{"ts": 1767994499.136754, "type": "token_committed", "mode": "WORD", "token": "Assignment Completed", "blink_sequence_sec": [0.08815479278564453, 0.6364707946777344], "transcript": "Relay Assignment Completed", "prompt": null}
+{"ts": 1767994501.5036705, "type": "blink_recorded", "blink_duration_sec": 0.5697400569915771}
+{"ts": 1767994501.8624885, "type": "blink_recorded", "blink_duration_sec": 0.07665896415710449}
+{"ts": 1767994503.7613385, "type": "blink_recorded", "blink_duration_sec": 0.7442507743835449}
+{"ts": 1767994504.160234, "type": "blink_recorded", "blink_duration_sec": 0.08568668365478516}
+{"ts": 1767994505.1634595, "type": "token_committed", "mode": "WORD", "token": "Estimated Time of Arrival", "blink_sequence_sec": [0.5697400569915771, 0.07665896415710449, 0.7442507743835449, 0.08568668365478516], "transcript": "Relay Assignment Completed Estimated Time of Arrival", "prompt": null}
+{"ts": 1767994506.9265842, "type": "blink_recorded", "blink_duration_sec": 0.1217656135559082}
+{"ts": 1767994507.9531891, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.1217656135559082], "transcript": "Relay Assignment Completed Estimated Time of Arrival Registration Information", "prompt": null}
+{"ts": 1767994511.400025, "type": "blink_recorded", "blink_duration_sec": 0.3934321403503418}
+{"ts": 1767994512.4231014, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.3934321403503418], "transcript": "Relay Assignment Completed Estimated Time of Arrival Registration Information Registration Information", "prompt": null}
+{"ts": 1767994513.6569946, "type": "blink_recorded", "blink_duration_sec": 0.12526679039001465}
+{"ts": 1767994514.9350615, "type": "blink_recorded", "blink_duration_sec": 0.302778959274292}
+{"ts": 1767994515.9586668, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.12526679039001465, 0.302778959274292], "transcript": "Relay Assignment Completed Estimated Time of Arrival Registration Information Registration Information Units Needed", "prompt": null}
+{"ts": 1767994517.1249528, "type": "blink_recorded", "blink_duration_sec": 0.12729573249816895}
+{"ts": 1767994518.1288953, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.12729573249816895], "transcript": "Relay Assignment Completed Estimated Time of Arrival Registration Information Registration Information Units Needed Registration Information", "prompt": null}
+{"ts": 1767994518.6365879, "type": "blink_recorded", "blink_duration_sec": 0.17190122604370117}
+{"ts": 1767994519.3077147, "type": "blink_recorded", "blink_duration_sec": 0.17088651657104492}
+{"ts": 1767994520.3265955, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.17190122604370117, 0.17088651657104492], "transcript": "Relay Assignment Completed Estimated Time of Arrival Registration Information Registration Information Units Needed Registration Information Units Needed", "prompt": null}
+{"ts": 1767994520.5967326, "type": "blink_recorded", "blink_duration_sec": 0.08217859268188477}
+{"ts": 1767994521.3200324, "type": "blink_recorded", "blink_duration_sec": 0.06215620040893555}
+{"ts": 1767994522.0031548, "type": "blink_recorded", "blink_duration_sec": 0.21452832221984863}
+{"ts": 1767994522.8066764, "type": "blink_recorded", "blink_duration_sec": 0.12981152534484863}
+{"ts": 1767994523.8351192, "type": "token_committed", "mode": "WORD", "token": "Pick Up", "blink_sequence_sec": [0.08217859268188477, 0.06215620040893555, 0.21452832221984863, 0.12981152534484863], "transcript": "Relay Assignment Completed Estimated Time of Arrival Registration Information Registration Information Units Needed Registration Information Units Needed Pick Up", "prompt": null}

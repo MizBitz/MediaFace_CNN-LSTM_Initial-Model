@@ -1,0 +1,19 @@
+{"ts": 1767994072.1206942, "type": "gesture_speak_sentence", "blink_duration_sec": 4.220207452774048, "mode": "WORD", "transcript": "", "prompt": null}
+{"ts": 1767994074.671603, "type": "gesture_speak_sentence", "blink_duration_sec": 2.2527968883514404, "mode": "WORD", "transcript": "", "prompt": null}
+{"ts": 1767994075.0463536, "type": "blink_recorded", "blink_duration_sec": 0.20539069175720215}
+{"ts": 1767994075.3007867, "type": "blink_recorded", "blink_duration_sec": 0.06211256980895996}
+{"ts": 1767994075.714502, "type": "blink_recorded", "blink_duration_sec": 0.06411361694335938}
+{"ts": 1767994076.2864974, "type": "blink_recorded", "blink_duration_sec": 0.19081497192382812}
+{"ts": 1767994077.332452, "type": "blink_recorded", "blink_duration_sec": 0.09516239166259766}
+{"ts": 1767994079.462603, "type": "blink_recorded", "blink_duration_sec": 1.8130550384521484}
+{"ts": 1767994079.8453028, "type": "blink_recorded", "blink_duration_sec": 0.0771031379699707}
+{"ts": 1767994080.9070575, "type": "token_committed", "mode": "WORD", "token": "In Service", "blink_sequence_sec": [0.20539069175720215, 0.06211256980895996, 0.06411361694335938, 0.19081497192382812, 0.09516239166259766, 1.8130550384521484, 0.0771031379699707], "transcript": "In Service", "prompt": null}
+{"ts": 1767994106.776175, "type": "blink_recorded", "blink_duration_sec": 0.06309866905212402}
+{"ts": 1767994107.1597784, "type": "blink_recorded", "blink_duration_sec": 0.06407952308654785}
+{"ts": 1767994108.1600826, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.06309866905212402, 0.06407952308654785], "transcript": "In Service Units Needed", "prompt": null}
+{"ts": 1767994111.9188924, "type": "blink_recorded", "blink_duration_sec": 0.10216832160949707}
+{"ts": 1767994112.92711, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.10216832160949707], "transcript": "In Service Units Needed Registration Information", "prompt": null}
+{"ts": 1767994117.3548572, "type": "blink_recorded", "blink_duration_sec": 0.1287083625793457}
+{"ts": 1767994118.8888607, "type": "blink_recorded", "blink_duration_sec": 0.46775269508361816}
+{"ts": 1767994119.8985813, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.1287083625793457, 0.46775269508361816], "transcript": "In Service Units Needed Registration Information Units Needed", "prompt": null}
+{"ts": 1767994122.5985484, "type": "blink_recorded", "blink_duration_sec": 0.06810784339904785}

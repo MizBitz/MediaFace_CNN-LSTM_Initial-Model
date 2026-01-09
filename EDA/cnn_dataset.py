@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter
 
-DATASET_ROOT = "dataset_dynamic_3d"
+DATASET_ROOT = r"S:\Video Recording\dataset_dynamic_aligned"
 CLASSES = ["open", "closed"]
 
 def lens_from_name(name: str) -> str:
