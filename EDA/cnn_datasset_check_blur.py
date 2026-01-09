@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # ==========================================
 #           CONFIGURATION
 # ==========================================
-DATASET_DIR = r"S:\VSCode Projects\MediaFace\dataset_uncleaned"  # Your dataset folder
+DATASET_DIR = r"S:\VSCode Projects\MediaFace\dataset_dynamic_aligned"  # Your dataset folder
 EXTENSIONS = ["*.jpg", "*.png", "*.jpeg"]
 
 def calculate_sharpness_scores(root_dir):

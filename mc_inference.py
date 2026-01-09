@@ -30,9 +30,21 @@ HISTORY_POS = (680, 80)
 HISTORY_SIZE = (300, 600)
 
 # Timing Thresholds
-CHAR_PAUSE_THRESHOLD = 2.0  
-WORD_PAUSE_THRESHOLD = 5.0  
+CHAR_PAUSE_THRESHOLD = 1.0  
+WORD_PAUSE_THRESHOLD = 2.0  
+# Word pause only starts after being idle for this long (no committed letters)
+WORD_PAUSE_GRACE = 2.0
 MIN_OPEN_STABILITY = 0.1 # seconds; debounce time to ignore blink glitches
+
+# Head-gesture controls
+# Uses a simple yaw ratio from FaceMesh landmarks.
+# Note: depending on camera mirroring, you may need to flip RIGHT/LEFT.
+HEAD_BACKSPACE_ENABLED = True
+HEAD_BACKSPACE_DIRECTION = "RIGHT"  # "RIGHT" or "LEFT"
+HEAD_BACKSPACE_YAW_THRESHOLD = 0.35  # higher = more turn required
+HEAD_BACKSPACE_YAW_RESET = 0.20      # hysteresis reset threshold (must return below this)
+HEAD_BACKSPACE_HOLD_SEC = 0.25       # must hold the turn for this long
+HEAD_BACKSPACE_COOLDOWN_SEC = 0.75   # minimum time between backspaces
 
 # ==========================================
 #           TEXT TO SPEECH SETUP
@@ -132,6 +144,10 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True)
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
 
+NOSE_TIP = 1
+LEFT_EYE_OUTER = 33
+RIGHT_EYE_OUTER = 263
+
 # ==========================================
 #           HELPER FUNCTIONS
 # ==========================================
@@ -165,6 +181,18 @@ def get_eye_crop(frame, landmarks, w, h):
     x2, y2 = min(cx + half, w), min(cy + half, h)
     return frame[y1:y2, x1:x2]
 
+def get_yaw_ratio(landmarks):
+    """Approx head yaw estimate: nose horizontal offset from eye-mid, normalized by face width."""
+    nose = landmarks[NOSE_TIP]
+    left_outer = landmarks[LEFT_EYE_OUTER]
+    right_outer = landmarks[RIGHT_EYE_OUTER]
+
+    eye_mid_x = (left_outer.x + right_outer.x) / 2.0
+    face_width = abs(right_outer.x - left_outer.x)
+    if face_width < 1e-6:
+        return 0.0
+    return (nose.x - eye_mid_x) / face_width
+
 # ==========================================
 #           MAIN LOOP
 # ==========================================
@@ -175,8 +203,40 @@ def main():
     closed_start_time = 0
     potential_open_start = None
     last_open_time = time.time()
+    last_token_time = last_open_time  # last time we committed a letter/word
     current_blink_sequence = []
     decoded_history = [] # List of strings instead of single string
+
+    # Word/sentence assembly (CHAR mode builds words from letters)
+    current_word = ""
+    transcript_words = []  # list[str]
+
+    # Head-turn backspace state
+    head_turn_start = None
+    head_backspace_armed = True
+    head_backspace_cooldown_until = 0.0
+
+    def handle_backspace(now_ts: float):
+        """Delete last character (CHAR mode) or last word token (WORD mode)."""
+        nonlocal current_word, transcript_words, last_token_time
+
+        if current_mode == "CHAR":
+            if current_word:
+                current_word = current_word[:-1]
+            elif transcript_words:
+                last = transcript_words[-1]
+                if len(last) <= 1:
+                    transcript_words.pop()
+                else:
+                    transcript_words[-1] = last[:-1]
+        else:
+            if transcript_words:
+                transcript_words.pop()
+            elif current_word:
+                current_word = ""
+
+        # Prevent immediate auto-commit after editing
+        last_token_time = now_ts
     
     print("System Ready! SAPI TTS & Timers Enabled.")
     
@@ -202,6 +262,32 @@ def main():
 
         if results.multi_face_landmarks:
             landmarks = results.multi_face_landmarks[0].landmark
+
+            # Head-turn backspace gesture (runs even if eye crop fails)
+            if HEAD_BACKSPACE_ENABLED:
+                yaw = get_yaw_ratio(landmarks)
+                # Choose direction. If mirrored, swap RIGHT/LEFT or negate yaw.
+                if HEAD_BACKSPACE_DIRECTION.upper() == "RIGHT":
+                    turn_val = yaw
+                else:
+                    turn_val = -yaw
+
+                if turn_val > HEAD_BACKSPACE_YAW_THRESHOLD and now >= head_backspace_cooldown_until and head_backspace_armed:
+                    if head_turn_start is None:
+                        head_turn_start = now
+                    elif (now - head_turn_start) >= HEAD_BACKSPACE_HOLD_SEC:
+                        handle_backspace(now)
+                        head_backspace_cooldown_until = now + HEAD_BACKSPACE_COOLDOWN_SEC
+                        head_backspace_armed = False
+                        head_turn_start = None
+                else:
+                    # Not currently above threshold; clear timer.
+                    head_turn_start = None
+
+                # Re-arm only once the head returns near center (hysteresis)
+                if not head_backspace_armed and turn_val < HEAD_BACKSPACE_YAW_RESET:
+                    head_backspace_armed = True
+
             crop = get_eye_crop(frame, landmarks, w, h)
             
             if crop.size != 0:
@@ -225,6 +311,9 @@ def main():
                 
                 if cnn_val == 0: 
                     eye_state = "CLOSED"
+                    # Treat a detected closure as "activity" so we don't trigger CHAR_PAUSE while
+                    # a blink/hold is still in progress.
+                    last_open_time = now
                     potential_open_start = None
                     if not is_closed:
                         is_closed = True
@@ -248,20 +337,45 @@ def main():
         # 3. Prediction Timer Logic
         time_since_last_blink = now - last_open_time
         
-        # Trigger Prediction
+        # Trigger Prediction (commit a token after a "letter pause")
         if len(current_blink_sequence) > 0 and time_since_last_blink > CHAR_PAUSE_THRESHOLD:
-            predicted_char = predict_letter(current_blink_sequence)
-            if predicted_char:
-                decoded_history.append(predicted_char)
-                speak_text(predicted_char)
-                print(f"Result: {predicted_char}")
-            
-            current_blink_sequence = []
-            last_open_time = now # Reset timer to avoid immediate space
+            predicted = predict_letter(current_blink_sequence)
 
-        # Space detection (Optional: add visual separator or ignore)
-        # if time_since_last_blink > WORD_PAUSE_THRESHOLD:
-        #    pass 
+            if predicted and predicted != "?":
+                if current_mode == "CHAR":
+                    # Build words from letters
+                    current_word += predicted
+                    decoded_history.append(predicted)
+                    print(f"Letter: {predicted}")
+                else:
+                    # WORD mode: treat prediction as a full word token
+                    transcript_words.append(predicted)
+                    decoded_history.append(predicted)
+                    speak_text(predicted)
+                    print(f"Word: {predicted}")
+
+                last_token_time = now
+
+            current_blink_sequence = []
+            last_open_time = now  # reset pause timer after committing a token
+
+        # Word boundary:
+        # Only start counting a word-pause after we've been idle (no committed letters) for WORD_PAUSE_GRACE seconds.
+        time_since_last_token = now - last_token_time
+        if (
+            current_mode == "CHAR"
+            and current_word
+            and len(current_blink_sequence) == 0
+            and time_since_last_token > (WORD_PAUSE_GRACE + WORD_PAUSE_THRESHOLD)
+        ):
+            transcript_words.append(current_word)
+            speak_text(current_word)  # speak whole word
+            print(f"Word committed: {current_word}")
+            current_word = ""
+            last_token_time = now
+
+        # Human-readable transcript
+        transcript_text = " ".join(transcript_words + ([current_word] if current_word else []))
 
         # --- UI DRAWING ---
         # Create Canvas
@@ -317,8 +431,15 @@ def main():
         for dur in current_blink_sequence:
             if dur < 0.5: seq_str += "."
             else: seq_str += "-"
-        
-        cv2.putText(canvas, seq_str, (tx+20, ty+60), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 3)
+
+        # Show assembled text + current blink pattern
+        wrapped = textwrap.wrap(transcript_text, width=34)
+        if wrapped:
+            cv2.putText(canvas, wrapped[-1], (tx + 10, ty + 55), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 0), 2)
+        else:
+            cv2.putText(canvas, "(waiting)", (tx + 10, ty + 55), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (150, 150, 150), 2)
+
+        cv2.putText(canvas, seq_str, (tx + 10, ty + 90), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (50, 50, 50), 2)
 
         # 3. Translation History
         hx, hy = HISTORY_POS
@@ -330,7 +451,8 @@ def main():
 
         # Draw the decoded history (last 15 entries)
         y_offset = hy + 70
-        visible_history = decoded_history[-15:]
+        # Show most recent words (and partial current word)
+        visible_history = (transcript_words + ([current_word] if current_word else []))[-15:]
         for item in visible_history:
             cv2.putText(canvas, item, (hx+10, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
             y_offset += 35
@@ -339,6 +461,10 @@ def main():
         
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'): break
+        # Backspace support: Backspace key is commonly 8 (sometimes 127). 'b' is a fallback.
+        if key in (8, 127) or key == ord('b'):
+            handle_backspace(now)
+            continue
         if key == ord('c'):
             cap.release()
             current_cam_idx += 1
