@@ -1,0 +1,5 @@
+{"ts": 1767986931.4400673, "type": "blink_recorded", "blink_duration_sec": 0.062084197998046875}
+{"ts": 1767986932.4672456, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.062084197998046875], "transcript": "Registration Information", "prompt": null}
+{"ts": 1767986933.3920789, "type": "blink_recorded", "blink_duration_sec": 0.1302487850189209}
+{"ts": 1767986933.769451, "type": "blink_recorded", "blink_duration_sec": 0.21597599983215332}
+{"ts": 1767986934.7906094, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.1302487850189209, 0.21597599983215332], "transcript": "Registration Information Units Needed", "prompt": null}

@@ -5,8 +5,8 @@ import shutil
 # ================= CONFIGURATION =================
 # ONLY point this to your OPEN folder. 
 # Do not use on 'closed' folder.
-TARGET_FOLDER = r"S:\VSCode Projects\MediaFace\dataset_uncleaned\open" 
-TRASH_FOLDER = r"S:\VSCode Projects\MediaFace\dataset_uncleaned\blurry images\messy"
+TARGET_FOLDER = r"S:\VSCode Projects\MediaFace\dataset_dynamic_aligned\open" 
+TRASH_FOLDER = r"S:\VSCode Projects\MediaFace\dataset_dynamic_aligned\blurry images\messy"
 # =================================================
 
 def clean_non_eyes():

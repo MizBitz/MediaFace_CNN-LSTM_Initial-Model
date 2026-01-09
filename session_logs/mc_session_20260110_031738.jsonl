@@ -1,0 +1,51 @@
+{"ts": 1767986269.8681192, "type": "blink_recorded", "blink_duration_sec": 0.17089366912841797}
+{"ts": 1767986270.214381, "type": "blink_recorded", "blink_duration_sec": 0.08920621871948242}
+{"ts": 1767986271.2455826, "type": "token_committed", "mode": "CHAR", "token": "I", "blink_sequence_sec": [0.17089366912841797, 0.08920621871948242], "transcript": "I", "prompt": null}
+{"ts": 1767986273.3680186, "type": "blink_recorded", "blink_duration_sec": 0.08314800262451172}
+{"ts": 1767986275.8091338, "type": "token_committed", "mode": "CHAR", "token": "E", "blink_sequence_sec": [0.08314800262451172], "transcript": "E", "prompt": null}
+{"ts": 1767986277.715504, "type": "blink_recorded", "blink_duration_sec": 0.09573221206665039}
+{"ts": 1767986278.483499, "type": "blink_recorded", "blink_duration_sec": 0.17342066764831543}
+{"ts": 1767986279.50454, "type": "token_committed", "mode": "CHAR", "token": "I", "blink_sequence_sec": [0.09573221206665039, 0.17342066764831543], "transcript": "I", "prompt": null}
+{"ts": 1767986283.5451567, "type": "word_boundary_commit", "word": "I", "mode": "CHAR", "transcript": "I", "prompt": null}
+{"ts": 1767986295.002112, "type": "blink_recorded", "blink_duration_sec": 0.12529802322387695}
+{"ts": 1767986295.4700916, "type": "blink_recorded", "blink_duration_sec": 0.2124347686767578}
+{"ts": 1767986296.4686725, "type": "blink_recorded", "blink_duration_sec": 0.20093226432800293}
+{"ts": 1767986299.3442454, "type": "blink_recorded", "blink_duration_sec": 1.3647232055664062}
+{"ts": 1767986300.58181, "type": "blink_recorded", "blink_duration_sec": 0.22102808952331543}
+{"ts": 1767986303.9701037, "type": "gesture_speak_sentence", "blink_duration_sec": 2.636753797531128, "mode": "MORSE", "transcript": "I", "prompt": null}
+{"ts": 1767986312.6728938, "type": "blink_recorded", "blink_duration_sec": 0.23794794082641602}
+{"ts": 1767986313.4398954, "type": "blink_recorded", "blink_duration_sec": 0.08064913749694824}
+{"ts": 1767986313.7795315, "type": "blink_recorded", "blink_duration_sec": 0.1217505931854248}
+{"ts": 1767986315.0735893, "type": "blink_recorded", "blink_duration_sec": 0.17031192779541016}
+{"ts": 1767986320.6783333, "type": "blink_recorded", "blink_duration_sec": 0.08069586753845215}
+{"ts": 1767986323.2262871, "type": "blink_recorded", "blink_duration_sec": 0.13530778884887695}
+{"ts": 1767986323.4747698, "type": "blink_recorded", "blink_duration_sec": 0.0946955680847168}
+{"ts": 1767986324.3435235, "type": "blink_recorded", "blink_duration_sec": 0.11276531219482422}
+{"ts": 1767986325.403763, "type": "blink_recorded", "blink_duration_sec": 0.13880085945129395}
+{"ts": 1767986335.592643, "type": "blink_recorded", "blink_duration_sec": 0.06514477729797363}
+{"ts": 1767986344.8366165, "type": "blink_recorded", "blink_duration_sec": 0.10020136833190918}
+{"ts": 1767986346.0722857, "type": "blink_recorded", "blink_duration_sec": 0.7160296440124512}
+{"ts": 1767986348.6620178, "type": "blink_recorded", "blink_duration_sec": 0.13632416725158691}
+{"ts": 1767986349.9929774, "type": "blink_recorded", "blink_duration_sec": 0.8549044132232666}
+{"ts": 1767986350.6022372, "type": "blink_recorded", "blink_duration_sec": 0.13677048683166504}
+{"ts": 1767986351.6949878, "type": "blink_recorded", "blink_duration_sec": 0.12925314903259277}
+{"ts": 1767986352.169991, "type": "blink_recorded", "blink_duration_sec": 0.17037081718444824}
+{"ts": 1767986353.5333667, "type": "blink_recorded", "blink_duration_sec": 0.12726974487304688}
+{"ts": 1767986354.3866677, "type": "blink_recorded", "blink_duration_sec": 0.170867919921875}
+{"ts": 1767986355.0021043, "type": "blink_recorded", "blink_duration_sec": 0.17537927627563477}
+{"ts": 1767986359.779994, "type": "blink_recorded", "blink_duration_sec": 0.13677644729614258}
+{"ts": 1767986360.3551884, "type": "blink_recorded", "blink_duration_sec": 0.17184734344482422}
+{"ts": 1767986360.7991722, "type": "blink_recorded", "blink_duration_sec": 0.1382756233215332}
+{"ts": 1767986365.029145, "type": "gesture_speak_sentence", "blink_duration_sec": 3.408817768096924, "mode": "MORSE", "transcript": "I", "prompt": null}
+{"ts": 1767986369.0199904, "type": "blink_recorded", "blink_duration_sec": 0.134260892868042}
+{"ts": 1767986372.7371082, "type": "blink_recorded", "blink_duration_sec": 0.13428354263305664}
+{"ts": 1767986374.3373733, "type": "blink_recorded", "blink_duration_sec": 1.1213061809539795}
+{"ts": 1767986378.295688, "type": "blink_recorded", "blink_duration_sec": 0.0686180591583252}
+{"ts": 1767986379.3173087, "type": "blink_recorded", "blink_duration_sec": 0.16333675384521484}
+{"ts": 1767986384.0936503, "type": "gesture_speak_sentence", "blink_duration_sec": 3.037666082382202, "mode": "MORSE", "transcript": "I", "prompt": null}
+{"ts": 1767986387.0246432, "type": "blink_recorded", "blink_duration_sec": 0.10171079635620117}
+{"ts": 1767986390.300489, "type": "blink_recorded", "blink_duration_sec": 0.1342754364013672}
+{"ts": 1767986391.5270565, "type": "blink_recorded", "blink_duration_sec": 0.8858344554901123}
+{"ts": 1767986396.4045708, "type": "gesture_speak_sentence", "blink_duration_sec": 3.404956579208374, "mode": "MORSE", "transcript": "I", "prompt": null}
+{"ts": 1767986398.6557195, "type": "blink_recorded", "blink_duration_sec": 0.13679838180541992}
+{"ts": 1767986400.3291984, "type": "blink_recorded", "blink_duration_sec": 1.2941927909851074}

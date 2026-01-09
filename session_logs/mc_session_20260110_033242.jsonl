@@ -1,0 +1,45 @@
+{"ts": 1767987164.5513227, "type": "blink_recorded", "blink_duration_sec": 0.5527534484863281}
+{"ts": 1767987165.1506827, "type": "blink_recorded", "blink_duration_sec": 0.062082767486572266}
+{"ts": 1767987165.577271, "type": "blink_recorded", "blink_duration_sec": 0.18975162506103516}
+{"ts": 1767987167.3607025, "type": "blink_recorded", "blink_duration_sec": 1.4059033393859863}
+{"ts": 1767987168.6374922, "type": "token_committed", "mode": "WORD", "token": "Existing Conditions", "blink_sequence_sec": [0.5527534484863281, 0.062082767486572266, 0.18975162506103516, 1.4059033393859863], "transcript": "Existing Conditions", "prompt": null}
+{"ts": 1767987169.004031, "type": "blink_recorded", "blink_duration_sec": 0.0645897388458252}
+{"ts": 1767987169.516315, "type": "blink_recorded", "blink_duration_sec": 0.18127226829528809}
+{"ts": 1767987170.5278885, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.0645897388458252, 0.18127226829528809], "transcript": "Existing Conditions Units Needed", "prompt": null}
+{"ts": 1767987183.0105548, "type": "blink_recorded", "blink_duration_sec": 0.1066582202911377}
+{"ts": 1767987184.0677757, "type": "blink_recorded", "blink_duration_sec": 0.568448543548584}
+{"ts": 1767987185.0749445, "type": "token_committed", "mode": "CHAR", "token": "A", "blink_sequence_sec": [0.1066582202911377, 0.568448543548584], "transcript": "A", "prompt": null}
+{"ts": 1767987189.0793426, "type": "word_boundary_commit", "word": "A", "mode": "CHAR", "transcript": "A", "prompt": null}
+{"ts": 1767987190.1835594, "type": "blink_recorded", "blink_duration_sec": 0.13821816444396973}
+{"ts": 1767987191.8050342, "type": "token_committed", "mode": "CHAR", "token": "E", "blink_sequence_sec": [0.13821816444396973], "transcript": "E", "prompt": null}
+{"ts": 1767987194.483134, "type": "blink_recorded", "blink_duration_sec": 0.13920998573303223}
+{"ts": 1767987195.6653316, "type": "blink_recorded", "blink_duration_sec": 0.7791242599487305}
+{"ts": 1767987196.6703494, "type": "token_committed", "mode": "CHAR", "token": "A", "blink_sequence_sec": [0.13920998573303223, 0.7791242599487305], "transcript": "A", "prompt": null}
+{"ts": 1767987197.2812395, "type": "blink_recorded", "blink_duration_sec": 0.1517333984375}
+{"ts": 1767987198.3714762, "type": "blink_recorded", "blink_duration_sec": 0.7821569442749023}
+{"ts": 1767987199.3949804, "type": "token_committed", "mode": "CHAR", "token": "A", "blink_sequence_sec": [0.1517333984375, 0.7821569442749023], "transcript": "AA", "prompt": null}
+{"ts": 1767987200.1056013, "type": "blink_recorded", "blink_duration_sec": 0.10117959976196289}
+{"ts": 1767987201.208166, "type": "blink_recorded", "blink_duration_sec": 0.7500414848327637}
+{"ts": 1767987201.8140166, "type": "blink_recorded", "blink_duration_sec": 0.17026042938232422}
+{"ts": 1767987202.8360364, "type": "token_committed", "mode": "CHAR", "token": "R", "blink_sequence_sec": [0.10117959976196289, 0.7500414848327637, 0.17026042938232422], "transcript": "AAR", "prompt": null}
+{"ts": 1767987203.9286113, "type": "blink_recorded", "blink_duration_sec": 0.6129014492034912}
+{"ts": 1767987205.062735, "type": "blink_recorded", "blink_duration_sec": 0.681938886642456}
+{"ts": 1767987206.2871923, "type": "blink_recorded", "blink_duration_sec": 0.7622983455657959}
+{"ts": 1767987207.3096879, "type": "token_committed", "mode": "CHAR", "token": "O", "blink_sequence_sec": [0.6129014492034912, 0.681938886642456, 0.7622983455657959], "transcript": "AARO", "prompt": null}
+{"ts": 1767987208.267659, "type": "blink_recorded", "blink_duration_sec": 0.06659269332885742}
+{"ts": 1767987209.286199, "type": "token_committed", "mode": "CHAR", "token": "E", "blink_sequence_sec": [0.06659269332885742], "transcript": "AAROE", "prompt": null}
+{"ts": 1767987213.3033674, "type": "word_boundary_commit", "word": "AAROE", "mode": "CHAR", "transcript": "AAROE", "prompt": null}
+{"ts": 1767987222.3766606, "type": "blink_recorded", "blink_duration_sec": 0.08763575553894043}
+{"ts": 1767987223.2018886, "type": "blink_recorded", "blink_duration_sec": 0.12619376182556152}
+{"ts": 1767987224.7626486, "type": "blink_recorded", "blink_duration_sec": 0.7250323295593262}
+{"ts": 1767987227.0761847, "type": "blink_recorded", "blink_duration_sec": 0.06257867813110352}
+{"ts": 1767987228.4111392, "type": "blink_recorded", "blink_duration_sec": 0.7496318817138672}
+{"ts": 1767987230.0149038, "type": "blink_recorded", "blink_duration_sec": 0.10213828086853027}
+{"ts": 1767987231.1796274, "type": "blink_recorded", "blink_duration_sec": 0.7295393943786621}
+{"ts": 1767987232.4408946, "type": "blink_recorded", "blink_duration_sec": 0.1276717185974121}
+{"ts": 1767987233.0377924, "type": "blink_recorded", "blink_duration_sec": 0.15771985054016113}
+{"ts": 1767987233.9796362, "type": "blink_recorded", "blink_duration_sec": 0.17074894905090332}
+{"ts": 1767987239.4516535, "type": "buffer_decode", "decoded": "UA?", "mode": "BUFFER"}
+{"ts": 1767987243.2406554, "type": "blink_recorded", "blink_duration_sec": 0.13015055656433105}
+{"ts": 1767987244.6030297, "type": "blink_recorded", "blink_duration_sec": 0.06709671020507812}
+{"ts": 1767987248.1010416, "type": "blink_recorded", "blink_duration_sec": 0.13268470764160156}

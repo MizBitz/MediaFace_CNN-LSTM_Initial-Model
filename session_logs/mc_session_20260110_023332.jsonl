@@ -1,0 +1,16 @@
+{"ts": 1767983616.3343246, "type": "blink_recorded", "blink_duration_sec": 0.0871419906616211}
+{"ts": 1767983617.2707238, "type": "blink_recorded", "blink_duration_sec": 0.11516427993774414}
+{"ts": 1767983618.8947892, "type": "blink_recorded", "blink_duration_sec": 0.9598321914672852}
+{"ts": 1767983619.5271595, "type": "blink_recorded", "blink_duration_sec": 0.11044120788574219}
+{"ts": 1767983620.8081448, "type": "blink_recorded", "blink_duration_sec": 0.7421567440032959}
+{"ts": 1767983621.8282824, "type": "token_committed", "mode": "WORD", "token": "Standby", "blink_sequence_sec": [0.0871419906616211, 0.11516427993774414, 0.9598321914672852, 0.11044120788574219, 0.7421567440032959], "transcript": "Standby", "prompt": null}
+{"ts": 1767983624.696189, "type": "blink_recorded", "blink_duration_sec": 0.2963144779205322}
+{"ts": 1767983625.8718178, "type": "blink_recorded", "blink_duration_sec": 0.09736442565917969}
+{"ts": 1767983626.894308, "type": "token_committed", "mode": "WORD", "token": "Units Needed", "blink_sequence_sec": [0.2963144779205322, 0.09736442565917969], "transcript": "Standby Units Needed", "prompt": null}
+{"ts": 1767983628.1498318, "type": "blink_recorded", "blink_duration_sec": 0.08891820907592773}
+{"ts": 1767983629.0859883, "type": "blink_recorded", "blink_duration_sec": 0.12752699851989746}
+{"ts": 1767983629.7243915, "type": "blink_recorded", "blink_duration_sec": 0.16993141174316406}
+{"ts": 1767983630.726562, "type": "token_committed", "mode": "WORD", "token": "Ending Tour of Duty", "blink_sequence_sec": [0.08891820907592773, 0.12752699851989746, 0.16993141174316406], "transcript": "Standby Units Needed Ending Tour of Duty", "prompt": null}
+{"ts": 1767983632.7704046, "type": "blink_recorded", "blink_duration_sec": 0.13236641883850098}
+{"ts": 1767983633.4559076, "type": "blink_recorded", "blink_duration_sec": 0.13167858123779297}
+{"ts": 1767983634.558881, "type": "blink_recorded", "blink_duration_sec": 0.21248483657836914}

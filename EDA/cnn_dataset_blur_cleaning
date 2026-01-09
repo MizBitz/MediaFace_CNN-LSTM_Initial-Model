@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # ================= CONFIGURATION =================
 # UPDATE THIS PATH to your dataset folder
-DATASET_ROOT = r"S:\VSCode Projects\MediaFace\dataset_uncleaned"
+DATASET_ROOT = r"S:\VSCode Projects\MediaFace\dataset_dynamic_aligned"
 
 # BLUR THRESHOLD (The "Sharpness" Line)
 # Higher = Stricter (Deletes more)

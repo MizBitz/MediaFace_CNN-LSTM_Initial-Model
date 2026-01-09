@@ -1,0 +1,91 @@
+{"ts": 1767987878.6817925, "type": "blink_recorded", "blink_duration_sec": 0.06460905075073242}
+{"ts": 1767987879.6907933, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.06460905075073242], "transcript": "Registration Information", "prompt": null}
+{"ts": 1767987886.4480064, "type": "blink_recorded", "blink_duration_sec": 0.16990113258361816}
+{"ts": 1767987888.1207747, "type": "token_committed", "mode": "CHAR", "token": "E", "blink_sequence_sec": [0.16990113258361816], "transcript": "E", "prompt": null}
+{"ts": 1767987895.1455472, "type": "blink_recorded", "blink_duration_sec": 0.09970974922180176}
+{"ts": 1767987896.1711936, "type": "token_committed", "mode": "CHAR", "token": "E", "blink_sequence_sec": [0.09970974922180176], "transcript": "E", "prompt": null}
+{"ts": 1767987896.951379, "type": "blink_recorded", "blink_duration_sec": 0.6147968769073486}
+{"ts": 1767987897.975612, "type": "token_committed", "mode": "CHAR", "token": "T", "blink_sequence_sec": [0.6147968769073486], "transcript": "ET", "prompt": null}
+{"ts": 1767987906.3281739, "type": "blink_recorded", "blink_duration_sec": 0.06714797019958496}
+{"ts": 1767987906.7370749, "type": "blink_recorded", "blink_duration_sec": 0.06815505027770996}
+{"ts": 1767987907.4192612, "type": "blink_recorded", "blink_duration_sec": 0.13639545440673828}
+{"ts": 1767987908.9574344, "type": "token_committed", "mode": "CHAR", "token": "S", "blink_sequence_sec": [0.06714797019958496, 0.06815505027770996, 0.13639545440673828], "transcript": "S", "prompt": null}
+{"ts": 1767987911.071339, "type": "blink_recorded", "blink_duration_sec": 0.336803674697876}
+{"ts": 1767987911.2773528, "type": "blink_recorded", "blink_duration_sec": 0.06966471672058105}
+{"ts": 1767987915.5721483, "type": "blink_recorded", "blink_duration_sec": 0.06913304328918457}
+{"ts": 1767987916.573593, "type": "token_committed", "mode": "CHAR", "token": "E", "blink_sequence_sec": [0.06913304328918457], "transcript": "E", "prompt": null}
+{"ts": 1767987920.5918655, "type": "word_boundary_commit", "word": "E", "mode": "CHAR", "transcript": "E", "prompt": null}
+{"ts": 1767987926.4188828, "type": "blink_recorded", "blink_duration_sec": 0.06715989112854004}
+{"ts": 1767987927.6152184, "type": "blink_recorded", "blink_duration_sec": 0.7132458686828613}
+{"ts": 1767987929.5907066, "type": "blink_recorded", "blink_duration_sec": 0.14178109169006348}
+{"ts": 1767987931.2988539, "type": "blink_recorded", "blink_duration_sec": 0.12928485870361328}
+{"ts": 1767987931.908886, "type": "blink_recorded", "blink_duration_sec": 0.10075712203979492}
+{"ts": 1767987934.6169002, "type": "blink_recorded", "blink_duration_sec": 0.10475587844848633}
+{"ts": 1767987936.718906, "type": "blink_recorded", "blink_duration_sec": 1.9631938934326172}
+{"ts": 1767987942.9758713, "type": "buffer_decode", "decoded": "AEIA", "mode": "BUFFER"}
+{"ts": 1767987947.4985979, "type": "blink_recorded", "blink_duration_sec": 0.332805871963501}
+{"ts": 1767987950.1567442, "type": "blink_recorded", "blink_duration_sec": 0.8854739665985107}
+{"ts": 1767987957.710191, "type": "buffer_decode", "decoded": "ET", "mode": "BUFFER"}
+{"ts": 1767987960.352022, "type": "blink_recorded", "blink_duration_sec": 0.0701749324798584}
+{"ts": 1767987962.299158, "type": "blink_recorded", "blink_duration_sec": 1.3020744323730469}
+{"ts": 1767987964.3440535, "type": "blink_recorded", "blink_duration_sec": 0.06614136695861816}
+{"ts": 1767987966.0487442, "type": "blink_recorded", "blink_duration_sec": 1.1252713203430176}
+{"ts": 1767987966.732907, "type": "blink_recorded", "blink_duration_sec": 0.11177873611450195}
+{"ts": 1767987968.1062598, "type": "blink_recorded", "blink_duration_sec": 0.17246723175048828}
+{"ts": 1767987969.0515478, "type": "blink_recorded", "blink_duration_sec": 0.13530921936035156}
+{"ts": 1767987970.6863136, "type": "blink_recorded", "blink_duration_sec": 0.10471439361572266}
+{"ts": 1767987972.802524, "type": "blink_recorded", "blink_duration_sec": 0.13628625869750977}
+{"ts": 1767987973.266066, "type": "blink_recorded", "blink_duration_sec": 0.10923385620117188}
+{"ts": 1767987973.9034774, "type": "blink_recorded", "blink_duration_sec": 0.17139196395874023}
+{"ts": 1767987978.279097, "type": "buffer_decode", "decoded": "ARIES", "mode": "BUFFER"}
+{"ts": 1767987983.7847433, "type": "blink_recorded", "blink_duration_sec": 0.1362929344177246}
+{"ts": 1767987985.455055, "type": "blink_recorded", "blink_duration_sec": 1.0238335132598877}
+{"ts": 1767987986.854325, "type": "blink_recorded", "blink_duration_sec": 0.9201920032501221}
+{"ts": 1767987987.5047524, "type": "blink_recorded", "blink_duration_sec": 0.1678752899169922}
+{"ts": 1767987990.1080563, "type": "blink_recorded", "blink_duration_sec": 0.13628911972045898}
+{"ts": 1767987991.7147648, "type": "blink_recorded", "blink_duration_sec": 1.1566922664642334}
+{"ts": 1767987992.2099013, "type": "blink_recorded", "blink_duration_sec": 0.13579726219177246}
+{"ts": 1767987999.3020122, "type": "blink_recorded", "blink_duration_sec": 0.10173702239990234}
+{"ts": 1767988005.9864728, "type": "blink_recorded", "blink_duration_sec": 1.604771614074707}
+{"ts": 1767988008.0705829, "type": "blink_recorded", "blink_duration_sec": 1.0681374073028564}
+{"ts": 1767988009.635816, "type": "blink_recorded", "blink_duration_sec": 1.0590460300445557}
+{"ts": 1767988014.9584346, "type": "buffer_decode", "decoded": "PR E O", "mode": "BUFFER"}
+{"ts": 1767988018.8443928, "type": "blink_recorded", "blink_duration_sec": 0.10024356842041016}
+{"ts": 1767988022.7183766, "type": "blink_recorded", "blink_duration_sec": 0.12682771682739258}
+{"ts": 1767988026.4202638, "type": "blink_recorded", "blink_duration_sec": 0.12629008293151855}
+{"ts": 1767988028.1654356, "type": "blink_recorded", "blink_duration_sec": 0.10225582122802734}
+{"ts": 1767988030.7194712, "type": "blink_recorded", "blink_duration_sec": 0.12128353118896484}
+{"ts": 1767988037.8092625, "type": "blink_recorded", "blink_duration_sec": 0.06415581703186035}
+{"ts": 1767988044.3468235, "type": "blink_recorded", "blink_duration_sec": 0.06215262413024902}
+{"ts": 1767988046.1623986, "type": "blink_recorded", "blink_duration_sec": 0.4574587345123291}
+{"ts": 1767988047.49976, "type": "blink_recorded", "blink_duration_sec": 0.11023330688476562}
+{"ts": 1767988049.4369795, "type": "blink_recorded", "blink_duration_sec": 0.06211996078491211}
+{"ts": 1767988057.9779558, "type": "blink_recorded", "blink_duration_sec": 0.06467962265014648}
+{"ts": 1767988061.4624045, "type": "blink_recorded", "blink_duration_sec": 0.06262898445129395}
+{"ts": 1767988061.8868394, "type": "blink_recorded", "blink_duration_sec": 0.12526345252990723}
+{"ts": 1767988066.5498025, "type": "blink_recorded", "blink_duration_sec": 0.2039182186126709}
+{"ts": 1767988078.8533666, "type": "blink_recorded", "blink_duration_sec": 0.12734007835388184}
+{"ts": 1767988088.050731, "type": "blink_recorded", "blink_duration_sec": 0.2525656223297119}
+{"ts": 1767988088.7744634, "type": "blink_recorded", "blink_duration_sec": 0.48918843269348145}
+{"ts": 1767988091.7953513, "type": "blink_recorded", "blink_duration_sec": 0.15989398956298828}
+{"ts": 1767988092.5643272, "type": "blink_recorded", "blink_duration_sec": 0.29976367950439453}
+{"ts": 1767988093.4615395, "type": "blink_recorded", "blink_duration_sec": 0.3413417339324951}
+{"ts": 1767988094.3091342, "type": "blink_recorded", "blink_duration_sec": 0.29271984100341797}
+{"ts": 1767988095.7988126, "type": "blink_recorded", "blink_duration_sec": 0.26410460472106934}
+{"ts": 1767988096.4829504, "type": "blink_recorded", "blink_duration_sec": 0.07619595527648926}
+{"ts": 1767988098.5250826, "type": "blink_recorded", "blink_duration_sec": 0.07117104530334473}
+{"ts": 1767988100.2917528, "type": "blink_recorded", "blink_duration_sec": 0.10124540328979492}
+{"ts": 1767988107.9288967, "type": "blink_recorded", "blink_duration_sec": 0.14487481117248535}
+{"ts": 1767988109.3480906, "type": "token_committed", "mode": "WORD", "token": "Registration Information", "blink_sequence_sec": [0.14487481117248535], "transcript": "AEIA Registration Information", "prompt": null}
+{"ts": 1767988115.8126817, "type": "blink_recorded", "blink_duration_sec": 0.0947117805480957}
+{"ts": 1767988116.9559805, "type": "blink_recorded", "blink_duration_sec": 0.2145237922668457}
+{"ts": 1767988121.688732, "type": "blink_recorded", "blink_duration_sec": 0.2155618667602539}
+{"ts": 1767988130.960315, "type": "blink_recorded", "blink_duration_sec": 0.09579062461853027}
+{"ts": 1767988133.0567572, "type": "blink_recorded", "blink_duration_sec": 0.08069443702697754}
+{"ts": 1767988134.2488348, "type": "blink_recorded", "blink_duration_sec": 0.058150529861450195}
+{"ts": 1767988136.2298548, "type": "blink_recorded", "blink_duration_sec": 0.0791776180267334}
+{"ts": 1767988138.6344, "type": "blink_recorded", "blink_duration_sec": 0.2701911926269531}
+{"ts": 1767988139.124705, "type": "blink_recorded", "blink_duration_sec": 0.10780763626098633}
+{"ts": 1767988149.2796476, "type": "blink_recorded", "blink_duration_sec": 0.17239928245544434}
+{"ts": 1767988151.6897478, "type": "blink_recorded", "blink_duration_sec": 0.1257777214050293}
+{"ts": 1767988152.0034018, "type": "blink_recorded", "blink_duration_sec": 0.12475371360778809}

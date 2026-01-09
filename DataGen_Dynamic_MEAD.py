@@ -14,7 +14,7 @@ import zlib
 DATASET_DIR = "dataset_dynamic_aligned"
 
 # INPUT: Path to your MEAD dataset folder
-MEAD_ROOT_DIR = r"D:\Video Dataset" 
+MEAD_ROOT_DIR = r"S:\Video Recording" 
 
 # --- DYNAMIC CURVE CONFIGURATION ---
 # 1. Base Values (At mid-range distance, mild pose)

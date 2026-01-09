@@ -55,7 +55,7 @@ def main():
         transforms.Resize(IMAGE_SIZE),
         transforms.RandomApply([
             transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0))
-        ], p=0.15),
+        ], p=0),
         transforms.RandomAffine(
             degrees=10,
             translate=(0.05, 0.05),

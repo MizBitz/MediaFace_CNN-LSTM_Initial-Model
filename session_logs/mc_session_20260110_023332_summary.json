@@ -1,0 +1,21 @@
+{
+  "session_id": "20260110_023332",
+  "started_at": "2026-01-10T02:33:32",
+  "config": {
+    "CNN_MODEL_PATH": "S:\\VSCode Projects\\MediaFace\\eye_state_mobilenet.onnx",
+    "LSTM_MODEL_PATH": "blink_lstm.onnx",
+    "CHAR_PAUSE_THRESHOLD": 1.0,
+    "WORD_PAUSE_THRESHOLD": 2.0,
+    "WORD_PAUSE_GRACE": 2.0,
+    "SENTENCE_SPEAK_BLINK_SEC": 2.0,
+    "MIN_OPEN_STABILITY": 0.1,
+    "OPEN_PROB_THRESHOLD": 0.5
+  },
+  "eval": {
+    "enabled": false,
+    "force_char_mode": true,
+    "prompts_path": "eval_prompts.txt",
+    "attempts": []
+  },
+  "ended_at": "2026-01-10T02:33:55"
+}

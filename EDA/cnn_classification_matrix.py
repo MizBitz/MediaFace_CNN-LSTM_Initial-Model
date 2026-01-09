@@ -10,8 +10,8 @@ import numpy as np
 # ==========================================
 #           CONFIGURATION
 # ==========================================
-MODEL_PATH = "eye_state_cnn.pth"
-DATA_DIR = "S:\VSCode Projects\MediaFace\dataset_uncleaned"  # Ensure this points to your dataset folder
+MODEL_PATH = "eye_state_mobilenet.onnx"
+DATA_DIR = r"S:\VSCode Projects\Backup Code\cleaned_cnn_dataset"  # Ensure this points to your dataset folder
 BATCH_SIZE = 32
 IMAGE_SIZE = (64, 64)
 
