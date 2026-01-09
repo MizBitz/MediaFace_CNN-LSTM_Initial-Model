@@ -207,7 +207,21 @@ def main():
             if crop.size != 0:
                 # 1. Run CNN
                 cnn_out = ort_session.run(None, {cnn_input_name: preprocess_cnn(crop)})
-                cnn_val = np.argmax(cnn_out[0]) # 0=Closed, 1=Open
+                logits = cnn_out[0]
+
+                # train_cnn.py exports 2-class logits with shape (B, 2) (typically B=1)
+                # Class indices are assumed: 0=Closed, 1=Open
+                if isinstance(logits, list):
+                    logits = np.asarray(logits)
+                logits = np.asarray(logits)
+
+                if logits.ndim == 2 and logits.shape[0] >= 1 and logits.shape[1] >= 2:
+                    cnn_val = int(np.argmax(logits[0, :2]))
+                elif logits.ndim == 1 and logits.shape[0] >= 2:
+                    cnn_val = int(np.argmax(logits[:2]))
+                else:
+                    # Unexpected output shape; default to OPEN to avoid false blinks
+                    cnn_val = 1
                 
                 if cnn_val == 0: 
                     eye_state = "CLOSED"

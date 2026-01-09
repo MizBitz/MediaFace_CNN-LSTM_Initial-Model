@@ -1,0 +1,166 @@
+import cv2
+import numpy as np
+import os
+import random
+import shutil
+import matplotlib.pyplot as plt
+
+# ================= CONFIGURATION =================
+# UPDATE THIS PATH to your dataset folder
+DATASET_ROOT = r"S:\VSCode Projects\MediaFace\dataset_uncleaned"
+
+# BLUR THRESHOLD (The "Sharpness" Line)
+# Higher = Stricter (Deletes more)
+# Lower = Lenient (Keeps more)
+# Start at 50.0. If it deletes too many good images, lower it to 30.0.
+BLUR_THRESHOLD = 45.0 
+# =================================================
+
+def calculate_blur_score(image):
+    """
+    Calculates the 'Variance of Laplacian'.
+    High Score = Sharp Edges (In Focus)
+    Low Score = No Edges (Blurry/Flat)
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    score = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return score
+
+def show_comparison_grid(bad_files, good_files, folder_name):
+    """
+    Displays the 5x5 Review Grid.
+    Filters to show ONLY Left (_L) and Right (_R) eye crops.
+    """
+    # 1. FILTER: Only show L and R images (Ignore "combined" or others)
+    # We look for "_L." or "_R." in the filename (case insensitive)
+    vis_bad = [x for x in bad_files if "_L." in x[0].upper() or "_R." in x[0].upper()]
+    vis_good = [x for x in good_files if "_L." in x.upper() or "_R." in x.upper()]
+
+    # Fallback: If filter empties the list (e.g. naming is different), show everything
+    if not vis_bad: vis_bad = bad_files
+    if not vis_good: vis_good = good_files
+
+    n_show = 25
+    bad_sample = random.sample(vis_bad, min(len(vis_bad), n_show))
+    good_sample = random.sample(vis_good, min(len(vis_good), n_show))
+
+    fig = plt.figure(figsize=(16, 9)) # Wider 16:9 Aspect Ratio
+    fig.suptitle(f"REVIEW: {folder_name} (Threshold: {BLUR_THRESHOLD})", fontsize=16, fontweight='bold')
+
+    # Create subplots
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 1], wspace=0.1)
+    keep_grid = gs[0].subgridspec(5, 5, hspace=0.6, wspace=0.3) # Added hspace for text
+    delete_grid = gs[1].subgridspec(5, 5, hspace=0.6, wspace=0.3)
+
+    # --- LEFT PANEL: SHARP IMAGES (KEEP) ---
+    for i, file_path in enumerate(good_sample):
+        img = cv2.imread(file_path)
+        if img is None: continue
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        
+        row, col = divmod(i, 5)
+        ax = fig.add_subplot(keep_grid[row, col])
+        ax.imshow(img)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        
+        # Clean Title (Only on the first item to save space)
+        if i == 0:
+            ax.set_title("KEEP (Sharp)", color='green', fontsize=14, pad=10)
+
+    # --- RIGHT PANEL: BLURRY IMAGES (MOVE) ---
+    for i, item in enumerate(bad_sample):
+        file_path, score = item
+        img = cv2.imread(file_path)
+        if img is None: continue
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        
+        row, col = divmod(i, 5)
+        ax = fig.add_subplot(delete_grid[row, col])
+        ax.imshow(img)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        
+        # Move Score to BOTTOM (xlabel) to prevent overlap
+        ax.set_xlabel(f"Score: {int(score)}", color='red', fontsize=10)
+        
+        if i == 0:
+            ax.set_title(f"MOVE (< {BLUR_THRESHOLD})", color='red', fontsize=14, pad=10)
+
+    print(f"Displaying sample for {folder_name}... (Close window to proceed)")
+    
+    # Adjust layout to make room for headers
+    plt.subplots_adjust(top=0.85, bottom=0.05)
+    plt.show()
+
+def scan_and_clean_blur(folder_path):
+    folder_name = os.path.basename(folder_path)
+    print(f"\nScanning for blur in: {folder_name}...")
+    
+    files = [f for f in os.listdir(folder_path) if f.lower().endswith(('.jpg', '.png', '.jpeg'))]
+    
+    good_files = []
+    bad_files = [] # List of tuples: (filepath, score)
+    
+    for file in files:
+        filepath = os.path.join(folder_path, file)
+        img = cv2.imread(filepath)
+        
+        if img is None: continue
+
+        # Check Blur
+        score = calculate_blur_score(img)
+        
+        if score < BLUR_THRESHOLD:
+            bad_files.append((filepath, score))
+        else:
+            good_files.append(filepath)
+
+    # --- RESULTS ---
+    total_bad = len(bad_files)
+    if total_bad == 0:
+        print(f"No blurry images found in {folder_name}. Great!")
+        return
+
+    print(f"Found {total_bad} blurry images out of {len(files)}.")
+    
+    # --- VISUALIZATION ---
+    # Extract just the paths for the visualizer
+    bad_paths_for_grid = [(path, score) for path, score in bad_files]
+    show_comparison_grid(bad_paths_for_grid, good_files, folder_name)
+    
+    # --- CONFIRMATION ---
+    user_input = input(f" >> MOVE these {total_bad} blurry files to 'blurry images'? (y/n): ").strip().lower()
+    
+    if user_input == 'y':
+        dest_root = os.path.join(DATASET_ROOT, "blurry images", folder_name)
+        os.makedirs(dest_root, exist_ok=True)
+        print("Moving...", end="")
+        count = 0
+        for fpath, _ in bad_files:
+            try:
+                fname = os.path.basename(fpath)
+                dest_path = os.path.join(dest_root, fname)
+                # Avoid overwriting by appending numeric suffix if needed
+                if os.path.exists(dest_path):
+                    stem, ext = os.path.splitext(fname)
+                    idx = 1
+                    while os.path.exists(dest_path):
+                        dest_path = os.path.join(dest_root, f"{stem}_{idx}{ext}")
+                        idx += 1
+                shutil.move(fpath, dest_path)
+                count += 1
+            except Exception as e:
+                print(f"Error: {e}")
+        print(f" Done. Moved {count} files to {dest_root}.")
+    else:
+        print("Skipped move.")
+
+if __name__ == "__main__":
+    # Scan both folders
+    for subfolder in ["open", "closed"]:
+        target_dir = os.path.join(DATASET_ROOT, subfolder)
+        if os.path.exists(target_dir):
+            scan_and_clean_blur(target_dir)
+        else:
+            print(f"Folder not found: {target_dir}")
